@@ -1,17 +1,17 @@
-import fs from 'fs';
-import express from 'express';
-import dotenv from 'dotenv';
-import bodyParser from 'body-parser'
+import fs from "fs";
+import express from "express";
+import dotenv from "dotenv";
+import bodyParser from "body-parser";
 
-const app = express()
+const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 
-dotenv.config()
+dotenv.config();
 
-const getUsers = () => JSON.parse(fs.readFileSync('users.json'));
+const getUsers = () => JSON.parse(fs.readFileSync("users.json"));
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.send(`
   <html>
     <head>
@@ -33,34 +33,31 @@ app.get('/', (req, res) => {
       <br />
       <a href='delete'>Delete my user account</a>
     </body>
-  </html>`)
+  </html>`);
+});
 
-})
-
-app.post('/', (req, res) => {
-
-  const myObject = JSON.parse(fs.readFileSync('users.json'));
+app.post("/", (req, res) => {
+  const myObject = JSON.parse(fs.readFileSync("users.json"));
 
   const myArrayIndex = Object.entries(myObject);
 
   let username = req.body.username;
   let email = req.body.email;
   let password = req.body.password;
-  let id = myArrayIndex.length.toString()
+  let id = myArrayIndex.length.toString();
 
-  let key = username + '=' + id;
+  let key = username + "=" + id;
 
   let users = getUsers();
 
-  users[key] = { username, email, password, id};
+  users[key] = { username, email, password, id };
 
-  fs.writeFileSync('users.json', JSON.stringify(users));
+  fs.writeFileSync("users.json", JSON.stringify(users));
 
   res.json(users);
-  
 });
 
-app.get('/delete', (req, res) => {
+app.get("/delete", (req, res) => {
   res.send(`
     <form action='delete' method='POST'>
       <label>Insert your username</label>
@@ -71,30 +68,38 @@ app.get('/delete', (req, res) => {
   `);
 });
 
-app.post('/delete', (req, res) => {
-  const myObject = JSON.parse(fs.readFileSync('users.json'));
+app.post("/delete", (req, res) => {
+  const myObject = JSON.parse(fs.readFileSync("users.json"));
 
   const myArrayIndex = Object.entries(myObject);
 
   const usernameDelete = req.body.deleteUsername;
   const passwordDelete = req.body.deletePassword;
-  
+
   myArrayIndex.forEach((element) => {
     element.filter((specificElement) => {
-      if (specificElement.username === usernameDelete && specificElement.password === passwordDelete) {
-        let key = specificElement.username + '=' + specificElement.id;
+      if (
+        specificElement.username === usernameDelete &&
+        specificElement.password === passwordDelete
+      ) {
+        let key = specificElement.username + "=" + specificElement.id;
         delete myObject[key];
-        fs.writeFileSync('users.json', JSON.stringify(myObject));
-      } 
+        fs.writeFileSync("users.json", JSON.stringify(myObject));
+      }
     });
   });
 
   res.json(myObject);
+});
 
-})
+//The 404 Route (ALWAYS Keep this as the last route)
+app.get('*', (req, res) => { 
+  res.status(404);
+  res.send(`<h1>Error 404: Not Found :(</h1>`)
+});
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server is running in port ${PORT}`);
-})
+});

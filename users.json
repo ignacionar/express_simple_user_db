@@ -1,1 +1,8 @@
-{"123=0":{"username":"123","email":"123@gmail.com","password":"123","id":"0"}}
+{
+  "123=0": {
+    "username": "123",
+    "email": "123@gmail.com",
+    "password": "123",
+    "id": "0"
+  }
+}
